@@ -26,7 +26,7 @@ def pblm_uvSetNotMap1Mesh():
     for mesh in mc.ls(type='mesh', l=True):
         currUVset = mc.polyUVSet(mesh, q=True, cuv=True)
         if currUVset[0] != 'map1':
-            uvSetNotMap1.append(mesh)
+            uvSetNotMap1_ret.append(mesh)
     return uvSetNotMap1_ret
 
 def solve_uvSetNotMap1Mesh(err_items):

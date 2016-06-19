@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #################################################
 # Author : Chia Xin Lin
 # Version : 0.0.1
@@ -46,6 +47,8 @@ del pblm_functions
 del solve_functions
 
 def _record(function, log, title):
+    if not function:
+        return []
     try:
         err_items = function()
         if err_items:
@@ -81,13 +84,32 @@ def _parse_arg(command_line):
         return data_
     # ArgumentParser Init
     parse = argparse.ArgumentParser(
-        description='Inspector : Maya Check & Auto-Fix Package. ver '+VERSION)
+        description='Inspector : Maya Check & Solve Package. ver '+VERSION)
     # Add argument flag
     parse.add_argument('-s', '--solve',
         action='store_true', help='Go auto fix after check.')
-    parse.add_argument('data', type=_file_is_exists,
-        help='The Maya files specific(ma or mb)')
+    parse.add_argument('-i', '--include', type=argparse.FileType('r'),
+        metavar='include-list', help='Specific include check list')
+    parse.add_argument('data', type=_file_is_exists, nargs='+',
+        help='The Maya files specific')
     return parse.parse_args(command_line)
+
+def _include_parse(include_list):
+    global pblm_issue_maps
+    global solve_issue_maps
+    if not include_list:
+        return
+    text = include_list.read()
+    proposal = [t.strip() for t in text.split('\n')]
+    # Filter out any starts with '#'
+    proposal = filter(lambda p: not p.startswith('#'), proposal)
+    # Let function be None if this proposal is not in list
+    for key in pblm_issue_maps.keys():
+        if key not in proposal:
+            pblm_issue_maps[key] = None
+            solve_issue_maps[key] = None
+            print '# \"{0}\" has been removed'.format(key)
+    return proposal
 
 def _save_as_mayafile():
     global AUTOFIX_FILE_SUFFIX_MA
@@ -115,6 +137,7 @@ def main():
         # Argument flag collect
         maya_file_set = parse.data
         with_auto_fix = parse.solve
+        include_file = parse.include
         # If data is single, let it into list
         if not isinstance(maya_file_set, list):
             maya_file_set = [maya_file_set.replace('\\', '/')]
@@ -123,6 +146,7 @@ def main():
     except:
         sys.stderr.write('Failed to parse argument.')
         raise
+    proposal = _include_parse(include_file)
     # Loop in specific maya files
     for maya_file in maya_file_set:
         if not os.path.isfile(maya_file):

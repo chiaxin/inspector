@@ -34,7 +34,7 @@ def solve_alphaIsLuminanceIsNotOn(err_items):
     fix_list = []
     for item in err_items:
         if mc.getAttr(item+'.alphaIsLuminance') != 1:
-            mc.setAttr(item+'alphaIsLuminance', 1)
+            mc.setAttr(item+'.alphaIsLuminance', 1)
             fix_list.append(item)
     return fix_list
 

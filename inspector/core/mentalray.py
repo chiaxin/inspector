@@ -32,13 +32,13 @@ def solve_isBumpNormalError(err_items):
         print '// Mental Ray Plug-in is not loaded, ignore.'
         return []
     fix_list = []
-    for item in items:
-        if not mc.connectionInfo(item+'.standard_bump'):
+    for item in err_items:
+        if not mc.connectionInfo(item+'.standard_bump', id=True):
             mc.setAttr(item+'.standard_bumpX', 0)
             mc.setAttr(item+'.standard_bumpY', 0)
             mc.setAttr(item+'.standard_bumpZ', 0)
             fix_list.append(item)
-        if not mc.connectionInfo(item+'.overall_bump'):
+        if not mc.connectionInfo(item+'.overall_bump', id=True):
             mc.setAttr(item+'.overall_bumpX', 0)
             mc.setAttr(item+'.overall_bumpY', 0)
             mc.setAttr(item+'.overall_bumpZ', 0)
